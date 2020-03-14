@@ -36,7 +36,9 @@ void clearStrings() {
     StringDestroy(&diapers);
 }
 
-int checkItem(String* item_name) { // output 1 for bottles, 2 for rattles, 3 for diapers, and 0 for none
+// output 1 for bottles, 2 for rattles, 3 for diapers, and 0 for none
+
+int checkItem(String* item_name) {
     createStrings();
     int out = 0;
     if(StringIsEqualTo(item_name, &bottles)) {       out = 1;}
@@ -46,7 +48,9 @@ int checkItem(String* item_name) { // output 1 for bottles, 2 for rattles, 3 for
     return out;
 }
 
-int findCustomer(String *input_name) { // return index of customer in array, -1 if not there
+// return index of customer in array, -1 if not there
+
+int findCustomer(String *input_name) {
     int customerIndex = -1;
     for(int i = 0; i < num_customers; i++) {
         if(StringIsEqualTo(input_name, &customers[i].name)) { customerIndex = i;}
@@ -55,6 +59,7 @@ int findCustomer(String *input_name) { // return index of customer in array, -1 
 }
 
 /* clear the inventory and reset the customer database to empty */
+
 void reset(void) {
     for(int i = 0; i < num_customers; i++) {
         StringDestroy(&customers[i].name);
@@ -67,6 +72,8 @@ void reset(void) {
     INVENTORY_DIAPERS = 0;
     INVENTORY_BOTTLES = 0;
 }
+
+// prints a summary of bottles, rattles, and diapers purchasers (HELPER METHOD)
 
 void summarizeBottles() {
     int maxVal = 0;
@@ -122,6 +129,8 @@ void summarizeDiapers() {
     }
 }
 
+// Prints a summary of inventory stock and highest purchasers of each item (FORMATTING)
+
 void processSummarize() {
 
     printf("There are %d Bottles, %d Diapers and %d Rattles in inventory\n",
@@ -134,63 +143,78 @@ void processSummarize() {
 
 }
 
+// output formatting for purchasing errors
+
 void purchaseError(String* name) {
     printf("Sorry ");
     StringPrint(name);
     printf(" we only have ");
 }
 
+// customer purchases
+
 void processPurchase() {
 
+    // inputs
     String cname;
     String item;
     int purchase;
+
+    // compare val to determine which item is purchased
     int compare;
 
+    // read inputs
     readString(&cname);
     readString(&item);
     readNum(&purchase);
 
+    // clear memory after checking which item
     compare = checkItem(&item);
     StringDestroy(&item);
 
+    // check if customer already exists
     int customer_index = findCustomer(&cname);
-    if(customer_index != -1) {
-        StringDestroy(&cname);
-        cname = customers[customer_index].name;
-    }
 
-    if(purchase < 0) return;
+    // error check for if the purchase amount is negative
+    if(purchase < 0) {
+        StringDestroy(&cname);
+        return;
+    }
 
     // check for stock
 
     if(compare == 1 && purchase > INVENTORY_BOTTLES) {
         purchaseError(&cname);
         printf("%d Bottles\n", INVENTORY_BOTTLES);
+        StringDestroy(&cname);
         return;
     }
     else if(compare == 2 && purchase > INVENTORY_RATTLES) {
         purchaseError(&cname);
         printf("%d Rattles\n", INVENTORY_RATTLES);
+        StringDestroy(&cname);
         return;
     }
     else if(compare == 3 && purchase > INVENTORY_DIAPERS) {
         purchaseError(&cname);
         printf("%d Diapers\n", INVENTORY_DIAPERS);
+        StringDestroy(&cname);
         return;
     }
 
-    // create new customer if new customer
+    // create new customer if new customer, else clear memory of name
 
     if(customer_index == -1) {
         // create new customer
         num_customers++;
         customer_index = num_customers - 1;
-        customers[customer_index].name = cname; // TODO: change this if the name doesnt update
+        customers[customer_index].name = cname;
+    }
+    else {
+        StringDestroy(&cname);
     }
 
-    //-----------------------------------------------------------------------------------\\
-    // Actually purchase stuff
+    // Actually purchase stuff w inventory edits and customer edits
     if(compare == 1) {
         customers[customer_index].bottles += purchase;
         INVENTORY_BOTTLES -= purchase;
@@ -212,7 +236,7 @@ void processInventory() {
 
     String item;
     int new_stock;
-    uint8_t compare;
+    int compare;
 
     // read item type and number of items recieved
     readString(&item);

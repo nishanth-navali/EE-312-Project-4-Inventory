@@ -61,16 +61,16 @@ int main(void) {
 	summarize = StringCreate("Summarize");
 	quit = StringCreate("Quit");
 	
-	readInput("test1.txt");
-	reset();
-	readInput("test2.txt");
-	reset();
-	readInput("test3.txt");
-	reset();
+//	readInput("test1.txt");
+//	reset();
+//	readInput("test2.txt");
+//	reset();
+//	readInput("test3.txt");
+//	reset();
 	readInput("autogen1.txt");
 	reset();
-	readInput("BigBigTestCase.txt");
-	reset();
+//	readInput("BigBigTestCase.txt");
+//	reset();
 
 	/* all the test are done, time to clean up, let's deallocate our "constant strings" */
 	StringDestroy(&inventory);
